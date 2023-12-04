@@ -20,7 +20,7 @@ namespace WriteMoreAPI.DAL.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Book>(b => b.HasKey("Name"));
+            modelBuilder.Entity<Book>(b => b.HasKey("ID"));
         }
     }
 }

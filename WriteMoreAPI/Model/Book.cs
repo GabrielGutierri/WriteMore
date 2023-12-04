@@ -6,8 +6,12 @@ namespace WriteMoreAPI.Model
     [Table("Book")]
     public class Book
     {
-        [Column("Name")]
+        [Column("ID")]
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ID { get; set; }
+
+        [Column("Name")]
         public string? Name { get; set; }
         
         [Column("Author")]

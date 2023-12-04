@@ -1,4 +1,6 @@
 using WriteMoreAPI.DAL.Context;
+using WriteMoreAPI.DAL.Repository;
+using WriteMoreAPI.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServer<WriteMoreContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,4 +1,5 @@
-﻿using WriteMoreAPI.DAL.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using WriteMoreAPI.DAL.Context;
 using WriteMoreAPI.Model;
 
 namespace WriteMoreAPI.DAL.Repository
@@ -10,29 +11,37 @@ namespace WriteMoreAPI.DAL.Repository
         {
             _context = context;
         }
-        public Task<Book> CreateAsync(Book entity)
+        public async Task<Book> CreateAsync(Book entity)
         {
-            throw new NotImplementedException();
+            await _context.Books.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var book = _context.Books.FirstOrDefault(b => b.ID == id);
+            if(book != null)
+                _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<Book>> GetAllAsync()
+        public async Task<IEnumerable<Book>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Books.ToListAsync();
         }
 
-        public Task<Book> GetAsync(int id)
+        public async Task<Book> GetAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Books.Where(b => b.ID == id).FirstOrDefaultAsync();
+
         }
 
-        public Task<Book> UpdateAsync(Book entity)
+        public async Task<Book> UpdateAsync(Book entity)
         {
-            throw new NotImplementedException();
+            _context.Books.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
     }
 }
