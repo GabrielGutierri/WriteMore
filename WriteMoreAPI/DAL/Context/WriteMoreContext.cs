@@ -6,6 +6,7 @@ namespace WriteMoreAPI.DAL.Context
     public class WriteMoreContext: DbContext
     {
         public DbSet<Book> Books { get; set; }
+        public DbSet<Movie> Movies { get; set; }
         public WriteMoreContext(DbContextOptions<WriteMoreContext> options): base(options)
         {
             
@@ -21,6 +22,7 @@ namespace WriteMoreAPI.DAL.Context
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Book>(b => b.HasKey("ID"));
+            modelBuilder.Entity<Movie>(m => m.HasKey("ID"));
         }
     }
 }
