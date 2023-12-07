@@ -1,4 +1,4 @@
-﻿namespace WriteMoreAPI.DAL.Repository
+﻿namespace WriteMore.Domain.Interfaces.Repository
 {
     public interface IRepository<T> where T : class
     {

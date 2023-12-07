@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WriteMoreAPI.DAL.Context;
-using WriteMoreAPI.Model;
+﻿
+using Microsoft.EntityFrameworkCore;
+using WriteMore.Data.Context;
+using WriteMore.Domain.Interfaces.Repository;
+using WriteMore.Domain.Models;
 
-namespace WriteMoreAPI.DAL.Repository
+namespace WriteMore.Data.Repository
 {
     public class BookRepository : IRepository<Book>
     {

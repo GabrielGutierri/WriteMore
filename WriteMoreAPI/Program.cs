@@ -1,6 +1,7 @@
-using WriteMoreAPI.DAL.Context;
-using WriteMoreAPI.DAL.Repository;
-using WriteMoreAPI.Model;
+using WriteMore.Data.Context;
+using WriteMore.Data.Repository;
+using WriteMore.Domain.Interfaces.Repository;
+using WriteMore.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,7 @@
-﻿using System.Net.NetworkInformation;
+﻿using Microsoft.Extensions.Configuration;
+using System.Net.NetworkInformation;
 
-namespace WriteMoreAPI.DAL.Context
+namespace WriteMore.Data.Context
 {
     public class WriteMoreConnection
     {

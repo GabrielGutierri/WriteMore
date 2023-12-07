@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WriteMoreAPI.Model;
+﻿
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using WriteMore.Domain.Models;
 
-namespace WriteMoreAPI.DAL.Context
+namespace WriteMore.Data.Context
 {
     public class WriteMoreContext: DbContext
     {

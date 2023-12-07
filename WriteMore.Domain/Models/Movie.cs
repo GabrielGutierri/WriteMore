@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WriteMoreAPI.Model
+namespace WriteMore.Domain.Models
 {
     [Table("Movie")]
     public class Movie

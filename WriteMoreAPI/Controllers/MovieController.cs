@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WriteMoreAPI.DAL.Repository;
-using WriteMoreAPI.Model;
+using WriteMore.Domain.Interfaces.Repository;
+using WriteMore.Domain.Models;
 
 namespace WriteMoreAPI.Controllers
 {
