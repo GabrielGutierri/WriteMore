@@ -1,7 +1,9 @@
 using WriteMore.Data.Context;
 using WriteMore.Data.Repository;
 using WriteMore.Domain.Interfaces.Repository;
+using WriteMore.Domain.Interfaces.Services;
 using WriteMore.Domain.Models;
+using WriteMore.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServer<WriteMoreContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddScoped<IService<Book>, BookService>();
+builder.Services.AddScoped<IService<Movie>, MovieService>();
 builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
 var app = builder.Build();

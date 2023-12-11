@@ -1,43 +1,43 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WriteMore.Domain.Interfaces.Repository;
+using WriteMore.Domain.Interfaces.Services;
 using WriteMore.Domain.Models;
 
 namespace WriteMoreAPI.Controllers
 {
     public class MovieController: Controller
     {
-        private readonly IRepository<Movie> _movieRepository;
+        private readonly IService<Movie> _movieService;
 
-        public MovieController(IRepository<Movie> movieRepository)
+        public MovieController(IService<Movie> movieService)
         {
-            _movieRepository = movieRepository;
+            _movieService = movieService;
         }
 
         [HttpGet("/api/movie")]
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
         {
-            var movies = await _movieRepository.GetAllAsync();
+            var movies = await _movieService.GetAllAsync();
             return Ok(movies);
         }
 
         [HttpGet("/api/movie/{id}")]
         public async Task<ActionResult<Movie>> GetMovie(int id)
         {
-            var movie = await _movieRepository.GetAsync(id);
+            var movie = await _movieService.GetAsync(id);
             return Ok(movie);
         }
 
         [HttpPost("/api/movie")]
         public async Task<ActionResult<Movie>> AddMovie([FromBody] Movie movie)
         {
-            var movieAdded = await _movieRepository.CreateAsync(movie);
+            var movieAdded = await _movieService.CreateAsync(movie);
             return Ok(movieAdded);
         }
 
         [HttpPost("/api/movie/{id}")]
         public async Task RemoveMovie(int id)
         {
-            await _movieRepository.DeleteAsync(id);
+            await _movieService.DeleteAsync(id);
         }
     }
 }
