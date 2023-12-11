@@ -21,6 +21,7 @@
     <ProjectReference Include="..\WriteMore.Application\WriteMore.Application.csproj" />
     <ProjectReference Include="..\WriteMore.Data\WriteMore.Data.csproj" />
     <ProjectReference Include="..\WriteMore.Domain\WriteMore.Domain.csproj" />
+    <ProjectReference Include="..\WriteMore.Identity\WriteMore.Identity.csproj" />
   </ItemGroup>
 
 </Project>

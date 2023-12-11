@@ -4,6 +4,7 @@ using WriteMore.Domain.Interfaces.Repository;
 using WriteMore.Domain.Interfaces.Services;
 using WriteMore.Domain.Models;
 using WriteMore.Domain.Services;
+using WriteMore.Identity.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddSqlServer<WriteMoreContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddSqlServer<IdentityDataContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 builder.Services.AddScoped<IService<Book>, BookService>();
 builder.Services.AddScoped<IService<Movie>, MovieService>();
 builder.Services.AddScoped<IRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
