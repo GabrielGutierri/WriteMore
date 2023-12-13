@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WriteMore.Application.DTOs.Request;
 using WriteMore.Application.DTOs.Response;
 using WriteMore.Application.Interfaces.Services;
+using WriteMore.Identity.Configurations;
 
 namespace WriteMore.Identity.Services
 {
@@ -16,17 +19,19 @@ namespace WriteMore.Identity.Services
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly JwtBearerOptions _jwtOptions;
+        private readonly JwtOptions _jwtOptions;
 
-        public IdentityService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IOptions<JwtBearerOptions> jwtOptions)
+        public IdentityService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IOptions<JwtOptions> jwtOptions)
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _jwtOptions = (JwtBearerOptions?)jwtOptions;
+            _jwtOptions = (JwtOptions?)jwtOptions;
         }
         public async Task<LoginUserResponse> Login(LoginUserRequest loginRequest)
         {
             var result = await _signInManager.PasswordSignInAsync(loginRequest.Email, loginRequest.Password, false, false);
+            if (result.Succeeded)
+                return await GenerateToken(loginRequest.Email);
             //TO DO: ADD MFA
             var loginResponse = new LoginUserResponse(result.Succeeded);
             if(!result.Succeeded)
@@ -41,6 +46,41 @@ namespace WriteMore.Identity.Services
                     loginResponse.AddErrors("Invalid email or password");
             }
             return loginResponse;
+        }
+
+        private async Task<LoginUserResponse> GenerateToken(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var tokenClaims = await GetClaims(user);
+            var expireDate = DateTime.Now.AddSeconds(_jwtOptions.ExpireDate);
+            var jwt = new JwtSecurityToken(
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
+                claims: tokenClaims,
+                notBefore: DateTime.Now,
+                expires: expireDate,
+                signingCredentials: _jwtOptions.SigningCredentials
+                );
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            return new LoginUserResponse(success: true, token, expireDate);
+        }
+
+        private async Task<IList<Claim>> GetClaims(IdentityUser user)
+        {
+            var claims = await _userManager.GetClaimsAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, DateTime.Now.ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()));
+            
+            foreach(var role in roles)
+            {
+                claims.Add(new Claim("role", role));
+            }
+            return claims;
         }
 
         public async Task<RegisterUserResponse> RegisterUser(RegisterUserRequest registerRequest)
