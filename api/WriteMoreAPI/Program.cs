@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using WriteMore.API.Extensions;
 using WriteMore.Application.Interfaces.Services;
 using WriteMore.Data.Context;
 using WriteMore.Data.Repository;
@@ -17,23 +18,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddSqlServer<WriteMoreContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
-builder.Services.AddSqlServer<IdentityDataContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
-
-builder.Services.AddDefaultIdentity<IdentityUser>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<IdentityDataContext>()
-                .AddDefaultTokenProviders();
-
-builder.Services.AddScoped<IIdentityService, IdentityService>();
-
-builder.Services.AddScoped<IService<Book>, BookService>();
-builder.Services.AddScoped<IService<Movie>, MovieService>();
-builder.Services.AddScoped<IRepository<Book>, BookRepository>();
-builder.Services.AddScoped<IRepository<Movie>, MovieRepository>();
-
-
+builder.Services.AddContext(builder.Configuration);
+builder.Services.AddAPIServices();
+builder.Services.AddAuthentication(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
