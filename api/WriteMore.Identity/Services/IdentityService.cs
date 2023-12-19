@@ -25,7 +25,7 @@ namespace WriteMore.Identity.Services
         {
             _signInManager = signInManager;
             _userManager = userManager;
-            _jwtOptions = (JwtOptions?)jwtOptions;
+            _jwtOptions = jwtOptions.Value;
         }
         public async Task<LoginUserResponse> Login(LoginUserRequest loginRequest)
         {

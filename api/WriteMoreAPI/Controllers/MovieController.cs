@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WriteMore.Domain.Interfaces.Services;
 using WriteMore.Domain.Models;
 
 namespace WriteMoreAPI.Controllers
 {
+    [Authorize]
     public class MovieController: Controller
     {
         private readonly IService<Movie> _movieService;

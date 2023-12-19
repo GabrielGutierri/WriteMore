@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WriteMore.Domain.Interfaces.Repository;
 using WriteMore.Domain.Interfaces.Services;
 using WriteMore.Domain.Models;
 
 namespace WriteMoreAPI.Controllers
 {
+    [Authorize]
     public class BookController: Controller
     {
         private readonly IService<Book> _bookService;
