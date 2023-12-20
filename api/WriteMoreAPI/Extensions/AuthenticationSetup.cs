@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -56,5 +57,6 @@ namespace WriteMore.API.Extensions
                 options.TokenValidationParameters = tokenValidationParameters;
             });
         }
+
     }
 }
