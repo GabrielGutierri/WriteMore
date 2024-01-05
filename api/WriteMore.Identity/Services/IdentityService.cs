@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,9 +32,9 @@ namespace WriteMore.Identity.Services
         {
             var result = await _signInManager.PasswordSignInAsync(loginRequest.Email, loginRequest.Password, false, false);
             if (result.Succeeded)
-                return await GenerateToken(loginRequest.Email);
+                return await GenerateCredentials(loginRequest.Email);
             //TO DO: ADD MFA
-            var loginResponse = new LoginUserResponse(result.Succeeded);
+            var loginResponse = new LoginUserResponse();
             if(!result.Succeeded)
             {
                 if (result.IsLockedOut)
@@ -48,38 +49,68 @@ namespace WriteMore.Identity.Services
             return loginResponse;
         }
 
-        private async Task<LoginUserResponse> GenerateToken(string email)
+        public async Task<LoginUserResponse> LoginWhithoutPassword(string userId)
+        {
+            var userLoginResponse = new LoginUserResponse();
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (await _userManager.IsLockedOutAsync(user))
+                userLoginResponse.AddErrors("User locked...");
+            else if (!await _userManager.IsEmailConfirmedAsync(user))
+                userLoginResponse.AddErrors("User needs to confirm e-mail before login");
+            if (userLoginResponse.Success)
+                return await GenerateCredentials(user.Email);
+            return userLoginResponse;
+        }
+
+        private async Task<LoginUserResponse> GenerateCredentials(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            var tokenClaims = await GetClaims(user);
-            var expireDate = DateTime.Now.AddSeconds(_jwtOptions.ExpireDate);
+            var accessTokenClaims = await GetClaims(user, addUserClaim: true);
+            var refreshTokenClaims = await GetClaims(user, addUserClaim: false);
+
+            var expireDateAccessToken = DateTime.Now.AddSeconds(_jwtOptions.AccessTokenExpiration);
+            var expireDateRefreshToken = DateTime.Now.AddSeconds(_jwtOptions.RefreshTokenExpiration);
+
+            var accessToken = GenerateToken(accessTokenClaims, expireDateAccessToken);
+            var refreshToken = GenerateToken(refreshTokenClaims, expireDateRefreshToken);
+
+            return new LoginUserResponse(success: true, accessToken, refreshToken);
+        }
+
+        private string GenerateToken(IEnumerable<Claim> claims, DateTime expireDate)
+        {
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
-                claims: tokenClaims,
+                claims: claims,
                 notBefore: DateTime.Now,
                 expires: expireDate,
                 signingCredentials: _jwtOptions.SigningCredentials
                 );
-            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            return new LoginUserResponse(success: true, token, expireDate);
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
-        private async Task<IList<Claim>> GetClaims(IdentityUser user)
+        private async Task<IList<Claim>> GetClaims(IdentityUser user, bool addUserClaim)
         {
-            var claims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
+            var claims = new List<Claim>();
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
             claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, DateTime.Now.ToString()));
             claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()));
-            
-            foreach(var role in roles)
+
+            if (addUserClaim)
             {
-                claims.Add(new Claim("role", role));
+                var userClaims = await _userManager.GetClaimsAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                claims.AddRange(userClaims);
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim("role", role));
+                }
             }
+           
             return claims;
         }
 

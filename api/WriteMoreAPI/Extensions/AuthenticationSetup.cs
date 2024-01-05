@@ -19,7 +19,8 @@ namespace WriteMore.API.Extensions
                 options.Issuer = jwtAppSettingOptions[nameof(JwtOptions.Issuer)];
                 options.Audience = jwtAppSettingOptions[nameof(JwtOptions.Audience)];
                 options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
-                options.ExpireDate = int.Parse(jwtAppSettingOptions[nameof(JwtOptions.ExpireDate)] ?? "0");
+                options.AccessTokenExpiration = int.Parse(jwtAppSettingOptions[nameof(JwtOptions.AccessTokenExpiration)] ?? "0");
+                options.RefreshTokenExpiration = int.Parse(jwtAppSettingOptions[nameof(JwtOptions.RefreshTokenExpiration)] ?? "0");
             });
 
             services.Configure<IdentityOptions>(options =>

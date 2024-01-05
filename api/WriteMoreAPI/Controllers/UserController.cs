@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WriteMore.Application.DTOs.Request;
 using WriteMore.Application.DTOs.Response;
 using WriteMore.Application.Interfaces.Services;
@@ -28,6 +30,20 @@ namespace WriteMore.API.Controllers
             if (result.Success)
                 return Ok(result);
             return Unauthorized(result);
+        }
+
+        [Authorize]
+        [HttpPost("refresh-login")]
+        public async Task<ActionResult<LoginUserResponse>> RefreshLogin()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userId = identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return BadRequest();
+            var result = await _identityService.LoginWhithoutPassword(userId);
+            if (result.Success)
+                return Ok(result);
+            return Unauthorized();
         }
     }
 }

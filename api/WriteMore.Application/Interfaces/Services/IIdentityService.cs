@@ -13,5 +13,7 @@ namespace WriteMore.Application.Interfaces.Services
         Task<RegisterUserResponse> RegisterUser(RegisterUserRequest registerRequest);
 
         Task<LoginUserResponse> Login(LoginUserRequest loginRequest);
+        Task<LoginUserResponse> LoginWhithoutPassword(string userId);
+
     }
 }
